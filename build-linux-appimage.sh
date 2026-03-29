@@ -21,6 +21,7 @@ mkdir -p "$APPDIR/usr/bin" "$APPDIR/usr/share/applications" "$APPDIR/usr/share/i
 cp "$ROOT_DIR/dist/sony-visualizer" "$APPDIR/usr/bin/sony-visualizer"
 chmod +x "$APPDIR/usr/bin/sony-visualizer"
 cp "$ROOT_DIR/sony_logo.svg" "$APPDIR/usr/share/icons/hicolor/scalable/apps/sony-visualizer.svg"
+cp "$ROOT_DIR/sony_logo.svg" "$APPDIR/sony-visualizer.svg"
 
 cat > "$APPDIR/sony-visualizer.desktop" <<'EOF'
 [Desktop Entry]
@@ -33,7 +34,7 @@ Terminal=false
 EOF
 
 cp "$APPDIR/sony-visualizer.desktop" "$APPDIR/usr/share/applications/sony-visualizer.desktop"
-cp "$ROOT_DIR/sony_logo.svg" "$APPDIR/.DirIcon"
+ln -sf "sony-visualizer.svg" "$APPDIR/.DirIcon"
 
 TOOLS_DIR="$ROOT_DIR/.tools"
 mkdir -p "$TOOLS_DIR"
