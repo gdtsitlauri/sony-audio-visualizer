@@ -20,6 +20,7 @@ mkdir -p "$APPDIR/usr/bin" "$APPDIR/usr/share/applications" "$APPDIR/usr/share/i
 
 cp "$ROOT_DIR/dist/sony-visualizer" "$APPDIR/usr/bin/sony-visualizer"
 chmod +x "$APPDIR/usr/bin/sony-visualizer"
+ln -sf "usr/bin/sony-visualizer" "$APPDIR/AppRun"
 cp "$ROOT_DIR/sony_logo.svg" "$APPDIR/usr/share/icons/hicolor/scalable/apps/sony-visualizer.svg"
 cp "$ROOT_DIR/sony_logo.svg" "$APPDIR/sony-visualizer.svg"
 
