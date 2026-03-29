@@ -12,6 +12,7 @@ pyinstaller --noconfirm --clean --onefile \
   --windowed \
   --add-data "sony_logo.svg:." \
   --add-data "sony.ico:." \
+  --collect-data soundcard \
   visualizer.py
 
 APPDIR="$ROOT_DIR/dist/AppDir"
@@ -27,11 +28,15 @@ cp "$ROOT_DIR/sony_logo.svg" "$APPDIR/sony-visualizer.svg"
 cat > "$APPDIR/sony-visualizer.desktop" <<'EOF'
 [Desktop Entry]
 Type=Application
+Version=1.0
 Name=Sony Visualizer
 Exec=sony-visualizer
 Icon=sony-visualizer
+StartupWMClass=sony-visualizer
+X-GNOME-WMClass=sony-visualizer
 Categories=AudioVideo;Audio;
 Terminal=false
+StartupNotify=true
 EOF
 
 cp "$APPDIR/sony-visualizer.desktop" "$APPDIR/usr/share/applications/sony-visualizer.desktop"

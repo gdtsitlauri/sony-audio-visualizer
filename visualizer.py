@@ -1,4 +1,4 @@
-﻿
+
 def resource_path(filename):
     import sys
     import os
@@ -40,6 +40,19 @@ MIN_FREQ_HZ = 28.0
 MAX_FREQ_HZ = 18000.0
 VISUAL_PRESET = "accurate"  # accurate | balanced
 CAPTURE_SOURCE = "auto"  # auto | loopback | stereo_mix
+
+VIRTUAL_LOOPBACK_TERMS = (
+    "blackhole",
+    "loopback",
+    "soundflower",
+    "vb-cable",
+    "background music",
+    "monitor of",
+)
+
+def _is_virtual_loopback_name(name):
+    lname = str(name).lower()
+    return any(term in lname for term in VIRTUAL_LOOPBACK_TERMS)
 
 VISUAL_PRESETS = {
     "accurate": {
@@ -128,6 +141,27 @@ def _pick_stereo_mix_mic(sc, default_speaker):
 
 
 
+def _pick_virtual_loopback_mic(sc, default_speaker=None):
+    try:
+        mics = sc.all_microphones(include_loopback=True)
+    except Exception:
+        return None
+
+    candidates = [m for m in mics if _is_virtual_loopback_name(getattr(m, "name", ""))]
+    if not candidates:
+        return None
+
+    if default_speaker is not None:
+        speaker_tokens = [
+            t for t in re.split(r"[^a-z0-9]+", default_speaker.name.lower()) if len(t) >= 4
+        ]
+        for mic in candidates:
+            lname = str(getattr(mic, "name", "")).lower()
+            if any(tok in lname for tok in speaker_tokens):
+                return mic
+
+    return candidates[0]
+
 def _pick_default_input_mic(sc):
     try:
         mic = sc.default_microphone()
@@ -197,6 +231,11 @@ def find_capture_mic():
                     return mic
         return loopbacks[0]
 
+    # Virtual loopback devices (especially common on macOS).
+    virtual_loopback_mic = _pick_virtual_loopback_mic(sc, default_speaker)
+    if virtual_loopback_mic is not None:
+        return virtual_loopback_mic
+
     # Cross-platform fallback for systems without loopback support.
     if source_mode == "auto":
         mic = _pick_default_input_mic(sc)
@@ -204,6 +243,10 @@ def find_capture_mic():
             return mic
 
     if source_mode == "loopback":
+        if sys.platform.startswith("darwin"):
+            raise RuntimeError(
+                "No loopback capture device found. Install a virtual loopback device (e.g. BlackHole), then route output to it, or switch CAPTURE_SOURCE to 'auto' for microphone fallback."
+            )
         raise RuntimeError(
             "No loopback capture device found. Switch CAPTURE_SOURCE to 'auto' for microphone fallback."
         )
@@ -255,6 +298,8 @@ class AudioWorker(QThread):
                 capture_kind = "stereo-mix"
             elif bool(getattr(mic, "isloopback", False)):
                 capture_kind = "loopback"
+            elif _is_virtual_loopback_name(capture_name_l):
+                capture_kind = "virtual-loopback"
             else:
                 capture_kind = "input"
 
@@ -1645,20 +1690,33 @@ if __name__ == "__main__":
             pass
 
     app = QApplication(sys.argv)
+    app.setApplicationName("Sony Visualizer")
 
-    icon_path = resource_path("sony.ico")
-    icon = QIcon(icon_path)
+    if sys.platform.startswith("linux"):
+        app.setApplicationName("sony-visualizer")
+        set_desktop_file_name = getattr(app, "setDesktopFileName", None)
+        if callable(set_desktop_file_name):
+            set_desktop_file_name("sony-visualizer")
 
-    app.setWindowIcon(icon)
+    if sys.platform.startswith("win"):
+        icon_candidates = ["sony.ico", "sony_logo.svg"]
+    else:
+        icon_candidates = ["sony_logo.svg", "sony.ico"]
+
+    icon = QIcon()
+    for icon_name in icon_candidates:
+        candidate_path = Path(resource_path(icon_name))
+        if not candidate_path.exists():
+            continue
+        candidate_icon = QIcon(str(candidate_path))
+        if not candidate_icon.isNull():
+            icon = candidate_icon
+            break
 
     window = SonyVisualizer()
-    window.setWindowIcon(icon)
+    if not icon.isNull():
+        app.setWindowIcon(icon)
+        window.setWindowIcon(icon)
     window.show()
 
     sys.exit(app.exec())
-
-
-
-
-
-

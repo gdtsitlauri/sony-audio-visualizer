@@ -1,20 +1,54 @@
-﻿# Sony Visualizer
+# Sony Visualizer
 
 Retro Sony-inspired desktop audio visualizer for Windows, Linux, and macOS (PySide6 + NumPy).
 
-## What It Captures
-- Prefers system-output loopback capture.
-- Falls back to default microphone input when loopback is unavailable (`CAPTURE_SOURCE="auto"`).
-- You can force modes in `visualizer.py`:
-  - `CAPTURE_SOURCE = "auto"`
-  - `CAPTURE_SOURCE = "loopback"`
-  - `CAPTURE_SOURCE = "stereo_mix"` (Windows only)
+## Download And Run (End Users)
+Download the file that matches your OS from the latest GitHub Release:
+- Windows: `Sony-Visualizer-vX.Y.Z-windows-x64.exe`
+- Linux: `Sony-Visualizer-vX.Y.Z-linux-x64.AppImage`
+- macOS: `Sony-Visualizer-vX.Y.Z-macos.dmg`
 
-## Requirements
-- Python 3.12
-- Windows 10/11, modern Linux desktop, or macOS 12+
+### Windows
+1. Download `Sony-Visualizer-vX.Y.Z-windows-x64.exe`.
+2. Double-click to run.
+3. If SmartScreen appears, click `More info` -> `Run anyway`.
 
-## Run From Source
+### Linux
+1. Download `Sony-Visualizer-vX.Y.Z-linux-x64.AppImage`.
+2. Open terminal in the download folder and run:
+```bash
+chmod +x Sony-Visualizer-vX.Y.Z-linux-x64.AppImage
+./Sony-Visualizer-vX.Y.Z-linux-x64.AppImage
+```
+3. If AppImage fails because of FUSE, run:
+```bash
+./Sony-Visualizer-vX.Y.Z-linux-x64.AppImage --appimage-extract-and-run
+```
+
+### macOS
+1. Download `Sony-Visualizer-vX.Y.Z-macos.dmg`.
+2. Open the DMG and drag `Sony Visualizer.app` to `Applications`.
+3. On first launch, if Gatekeeper blocks it: right-click app -> `Open` -> confirm.
+4. Allow audio/microphone permission when prompted.
+
+## System Audio Capture Notes (Important)
+- Windows: loopback/stereo mix usually works out of the box.
+- Linux: system-audio loopback depends on your PulseAudio/PipeWire setup.
+- macOS: for true system-output bars, install a virtual loopback device (for example BlackHole) and route output through it.
+- `CAPTURE_SOURCE="auto"` already prioritizes loopback sources and falls back to microphone if needed.
+
+## Controls
+- `Space`: Start/Stop capture
+- `P`: Change visual preset
+- `D`: Toggle debug overlay
+- `Esc`: Exit
+
+## Capture Modes (visualizer.py)
+- `CAPTURE_SOURCE = "auto"` (recommended)
+- `CAPTURE_SOURCE = "loopback"`
+- `CAPTURE_SOURCE = "stereo_mix"` (Windows only)
+
+## Run From Source (Developers)
 ```bash
 cd /path/to/visualizer
 python -m venv .venv
@@ -35,12 +69,6 @@ Install and run:
 pip install -r requirements.txt
 python visualizer.py
 ```
-
-## Controls
-- `Space`: Start/Stop capture
-- `P`: Change visual preset
-- `D`: Toggle debug overlay
-- `Esc`: Exit
 
 ## Build Packages (Manual)
 
@@ -70,16 +98,8 @@ RELEASE_TAG=v1.0.0 bash build-macos-dmg.sh
 Output:
 - `dist/Sony-Visualizer-v1.0.0-macos.dmg`
 
-## One-Link Distribution (GitHub Releases)
-Use one GitHub Release page and upload these 3 files:
-- `Sony-Visualizer-vX.Y.Z-windows-x64.exe`
-- `Sony-Visualizer-vX.Y.Z-linux-x64.AppImage`
-- `Sony-Visualizer-vX.Y.Z-macos.dmg`
-
-Each user downloads only the file for their OS.
-
 ## Automated Release (GitHub Actions)
-This repo includes workflows under `.github/workflows`:
+Workflows in `.github/workflows`:
 - `ci.yml`: smoke test on Windows/Linux/macOS
 - `release.yml`: build and publish release assets when you push a tag `v*`
 
@@ -89,13 +109,9 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-The workflow builds all 3 packages and attaches them to the GitHub Release automatically.
-
 ## Notes
 - `numpy<2` is pinned for `soundcard` compatibility.
-- Loopback availability depends on OS/audio setup (especially Linux/macOS).
-- On macOS, for system-output capture you may need a virtual loopback device (e.g. BlackHole).
-- On first run, macOS may request audio capture permissions.
+- On first run, macOS may request audio capture permission.
 
 ## Trademark Notice
 "Sony" name/logo are trademarks of Sony Group Corporation.

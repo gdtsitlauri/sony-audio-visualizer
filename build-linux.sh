@@ -11,6 +11,7 @@ pyinstaller --noconfirm --clean \
   --windowed \
   --add-data "sony_logo.svg:." \
   --add-data "sony.ico:." \
+  --collect-data soundcard \
   visualizer.py
 
 echo "Build complete: dist/sony-visualizer"
