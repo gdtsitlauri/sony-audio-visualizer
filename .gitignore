@@ -1,0 +1,41 @@
+﻿# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Build artifacts
+build/
+dist/
+*.exe
+*.msi
+*.AppImage
+*.dmg
+
+# Temp files
+.tmp/
+tmp/
+*.tmp
+.tools/
+
+# Logs
+*.log
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+
+# Test / tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
